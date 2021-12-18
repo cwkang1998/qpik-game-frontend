@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import twitterLogo from "./assets/twitter-logo.svg";
 import "./App.css";
+import { useWeb3 } from "./hooks/useWeb3";
 
 // Constants
 const TWITTER_HANDLE = "_buildspace";
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
 const App = () => {
+  const { connect } = useWeb3();
+
   return (
     <div className="App">
       <div className="container">
@@ -18,6 +21,13 @@ const App = () => {
               src="https://64.media.tumblr.com/tumblr_mbia5vdmRd1r1mkubo1_500.gifv"
               alt="Monty Python Gif"
             />
+
+            <button
+              className="cta-button connect-wallet-button"
+              onClick={() => connect()}
+            >
+              Connect Wallet to Get Started
+            </button>
           </div>
         </div>
         <div className="footer-container">
