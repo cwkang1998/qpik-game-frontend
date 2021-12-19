@@ -1,3 +1,5 @@
+import { JsonRpcSigner, Web3Provider } from "@ethersproject/providers";
+import { ethers } from "ethers";
 import { useCallback, useEffect, useState } from "react";
 
 const checkIfWalletConnectedAndGetEthereumObj = () => {
@@ -11,12 +13,29 @@ const checkIfWalletConnectedAndGetEthereumObj = () => {
   }
 };
 
+const checkNetwork = async () => {
+  const { ethereum } = window;
+  try {
+    if (ethereum.networkVersion !== "4") {
+      alert("Please connect to Rinkeby!");
+    }
+  } catch (err: any) {
+    console.log(err);
+  }
+};
+
 export const useWeb3 = () => {
   const [ethereum, setEthereum] = useState<any>(null);
   const [account, setAccount] = useState(null);
+  const [provider, setProvider] = useState<Web3Provider>();
+  const [signer, setSigner] = useState<JsonRpcSigner>();
+
   useEffect(() => {
     const obj = checkIfWalletConnectedAndGetEthereumObj();
     setEthereum(obj);
+    if (obj) {
+      checkNetwork();
+    }
   }, []);
 
   useEffect(() => {
@@ -31,6 +50,12 @@ export const useWeb3 = () => {
           console.log("No authorized account found.");
           setAccount(null);
         }
+
+        // Setup provider
+        const newProvider = new Web3Provider(ethereum);
+        const newSigner = newProvider.getSigner();
+        setProvider(newProvider);
+        setSigner(newSigner);
       }
     };
 
@@ -54,5 +79,5 @@ export const useWeb3 = () => {
     }
   }, [ethereum, account]);
 
-  return { account, connect };
+  return { account, provider, signer, connect };
 };

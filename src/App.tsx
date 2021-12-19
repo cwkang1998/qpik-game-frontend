@@ -3,14 +3,34 @@ import twitterLogo from "./assets/twitter-logo.svg";
 import "./App.css";
 import { useWeb3 } from "./hooks/useWeb3";
 import SelectCharacter from "./components/SelectCharacter";
+import { useQpikContract } from "./hooks/useQpikContract";
+import { transformCharacterData } from "./utils/transform";
+import { Character } from "./models/Character";
 
 // Constants
 const TWITTER_HANDLE = "_buildspace";
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
 const App = () => {
-  const { connect, account } = useWeb3();
-  const [characterNFT, setCharacterNFT] = useState(null);
+  const { connect, account, signer } = useWeb3();
+  const { fetchNFTMetadata } = useQpikContract(signer);
+  const [characterNFT, setCharacterNFT] = useState<Character>();
+
+  useEffect(() => {
+    const asyncFn = async () => {
+      const txn = await fetchNFTMetadata();
+      if (txn.name) {
+        console.log("User has character NFT");
+        setCharacterNFT(transformCharacterData(txn));
+      } else {
+        console.log("No character NFT found");
+      }
+    };
+    if (account) {
+      console.log("CurrentAccount:", account);
+      asyncFn();
+    }
+  }, [account]);
 
   const renderContent = () => {
     if (!account) {

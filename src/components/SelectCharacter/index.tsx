@@ -1,9 +1,10 @@
+import { Character } from "../../models/Character";
 import "./SelectCharacter.css";
 
 const SelectCharacter = ({
   setCharacterNFT,
 }: {
-  setCharacterNFT: React.Dispatch<React.SetStateAction<null>>;
+  setCharacterNFT: React.Dispatch<React.SetStateAction<Character | undefined>>;
 }) => {
   return (
     <div className="select-character-container">
