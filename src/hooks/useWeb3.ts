@@ -1,5 +1,4 @@
 import { JsonRpcSigner, Web3Provider } from "@ethersproject/providers";
-import { ethers } from "ethers";
 import { useCallback, useEffect, useState } from "react";
 
 const checkIfWalletConnectedAndGetEthereumObj = () => {

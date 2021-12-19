@@ -1,4 +1,6 @@
-export const transformCharacterData = (characterData: any) => {
+import { Character } from "../models/Character";
+
+export const transformCharacterData = (characterData: any): Character => {
   return {
     name: characterData.name,
     imageURI: characterData.imageURI,

@@ -13,24 +13,50 @@ const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
 const App = () => {
   const { connect, account, signer } = useWeb3();
-  const { fetchNFTMetadata } = useQpikContract(signer);
+  const { contract, fetchNFTMetadata } = useQpikContract(signer);
   const [characterNFT, setCharacterNFT] = useState<Character>();
 
   useEffect(() => {
+    const onCharacterMint = async (
+      sender: string,
+      tokenId: any,
+      characterIndex: any
+    ) => {
+      console.log(
+        `CharacterNFTMinted - sender: ${sender} tokenId: ${tokenId.toNumber()} characterIndex: ${characterIndex.toNumber()}`
+      );
+      if (contract) {
+        const txn = await fetchNFTMetadata();
+        console.log("CharacterNFT: ", txn);
+        setCharacterNFT(transformCharacterData(txn));
+      }
+    };
+
     const asyncFn = async () => {
       const txn = await fetchNFTMetadata();
-      if (txn.name) {
+      if (txn?.name) {
         console.log("User has character NFT");
         setCharacterNFT(transformCharacterData(txn));
       } else {
         console.log("No character NFT found");
       }
     };
+
     if (account) {
       console.log("CurrentAccount:", account);
       asyncFn();
     }
-  }, [account]);
+
+    if (contract) {
+      contract.on("CharacterNFTMinted", onCharacterMint);
+    }
+
+    return () => {
+      if (contract) {
+        contract.off("CharacterNFTMinted", onCharacterMint);
+      }
+    };
+  }, [account, contract, fetchNFTMetadata]);
 
   const renderContent = () => {
     if (!account) {
