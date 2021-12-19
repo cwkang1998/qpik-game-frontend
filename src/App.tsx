@@ -1,14 +1,38 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import twitterLogo from "./assets/twitter-logo.svg";
 import "./App.css";
 import { useWeb3 } from "./hooks/useWeb3";
+import SelectCharacter from "./components/SelectCharacter";
 
 // Constants
 const TWITTER_HANDLE = "_buildspace";
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
 const App = () => {
-  const { connect } = useWeb3();
+  const { connect, account } = useWeb3();
+  const [characterNFT, setCharacterNFT] = useState(null);
+
+  const renderContent = () => {
+    if (!account) {
+      return (
+        <div className="connect-wallet-container">
+          <img
+            src="https://64.media.tumblr.com/tumblr_mbia5vdmRd1r1mkubo1_500.gifv"
+            alt="Monty Python Gif"
+          />
+
+          <button
+            className="cta-button connect-wallet-button"
+            onClick={() => connect()}
+          >
+            Connect Wallet to Get Started
+          </button>
+        </div>
+      );
+    } else if (account && !characterNFT) {
+      return <SelectCharacter setCharacterNFT={setCharacterNFT} />;
+    }
+  };
 
   return (
     <div className="App">
@@ -16,19 +40,7 @@ const App = () => {
         <div className="header-container">
           <p className="header gradient-text">⚔️ Metaverse Slayer ⚔️</p>
           <p className="sub-text">Team up to protect the Metaverse!</p>
-          <div className="connect-wallet-container">
-            <img
-              src="https://64.media.tumblr.com/tumblr_mbia5vdmRd1r1mkubo1_500.gifv"
-              alt="Monty Python Gif"
-            />
-
-            <button
-              className="cta-button connect-wallet-button"
-              onClick={() => connect()}
-            >
-              Connect Wallet to Get Started
-            </button>
-          </div>
+          {renderContent()}
         </div>
         <div className="footer-container">
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
