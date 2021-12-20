@@ -6,6 +6,7 @@ import SelectCharacter from "./components/SelectCharacter";
 import { useQpikContract } from "./hooks/useQpikContract";
 import { transformCharacterData } from "./utils/transform";
 import { Character } from "./models/Character";
+import Arena from "./components/Arena";
 
 // Constants
 const TWITTER_HANDLE = "_buildspace";
@@ -77,6 +78,10 @@ const App = () => {
       );
     } else if (account && !characterNFT) {
       return <SelectCharacter setCharacterNFT={setCharacterNFT} />;
+    } else if (account && characterNFT) {
+      return (
+        <Arena characterNFT={characterNFT} setCharacterNFT={setCharacterNFT} />
+      );
     }
   };
 

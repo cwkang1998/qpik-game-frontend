@@ -43,6 +43,15 @@ export const useQpikContract = (signer?: JsonRpcSigner) => {
     return [];
   }, [contract]);
 
+  const fetchBoss = useCallback(async (): Promise<Character | null> => {
+    if (contract) {
+      const bossTxn = await contract.getBigBoss();
+      console.log("Boss:", bossTxn);
+      return bossTxn;
+    }
+    return null;
+  }, [contract]);
+
   const mintCharacterNFTAction = useCallback(
     async (characterId: number) => {
       if (contract) {
@@ -66,10 +75,21 @@ export const useQpikContract = (signer?: JsonRpcSigner) => {
     }
   }, [contract]);
 
+  const attackBoss = useCallback(async (): Promise<any> => {
+    if (contract) {
+      const attackTxn = await contract.attackBoss();
+      await attackTxn.wait();
+      return attackTxn;
+    }
+    return null;
+  }, [contract]);
+
   return {
     contract,
     fetchNFTMetadata,
     fetchDefaultCharacters,
+    fetchBoss,
     mintCharacterNFTAction,
+    attackBoss,
   };
 };
