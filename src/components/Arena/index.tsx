@@ -3,6 +3,7 @@ import { useQpikContract } from "../../hooks/useQpikContract";
 import { useWeb3 } from "../../hooks/useWeb3";
 import { Character } from "../../models/Character";
 import { transformCharacterData } from "../../utils/transform";
+import LoadingIndicator from "../LoadingIndicator";
 import "./Arena.css";
 
 const Arena = ({
@@ -16,14 +17,14 @@ const Arena = ({
   const { contract, fetchBoss, attackBoss } = useQpikContract(signer);
   const [boss, setBoss] = useState<Character>();
   const [attackState, setAttackState] = useState("");
+  const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     const asyncFn = async () => {
       const bossTxn = await fetchBoss();
-      if (bossTxn) {
-        setBoss(transformCharacterData(bossTxn));
-      }
+      setBoss(transformCharacterData(bossTxn));
     };
+    asyncFn();
 
     const onAttackComplete = (newBossHp: any, newPlayerHp: any) => {
       const bossHp = newBossHp.toNumber();
@@ -43,7 +44,6 @@ const Arena = ({
     if (contract) {
       contract.on("AttackComplete", onAttackComplete);
     }
-    asyncFn();
 
     return () => {
       if (contract) {
@@ -59,6 +59,10 @@ const Arena = ({
       const txn = await attackBoss();
       console.log("attackTxn:", txn);
       setAttackState("hit");
+      setShowToast(true);
+      setTimeout(() => {
+        setShowToast(false);
+      }, 5000);
     } catch (err: any) {
       console.error(err);
       setAttackState("");
@@ -67,6 +71,14 @@ const Arena = ({
 
   return (
     <div className="arena-container">
+      {/* Toasts */}
+      {boss && characterNFT && (
+        <div id="toast" className={showToast ? "show" : ""}>
+          <div id="desc">{`${boss.name} was hit for ${characterNFT.attackDamage}!`}</div>
+        </div>
+      )}
+
+      {/* Charactes */}
       {boss && (
         <div className="boss-container">
           <div className={`boss-content ${attackState}`}>
@@ -85,6 +97,12 @@ const Arena = ({
               onClick={runAttackAction}
             >{`Attack ${boss.name}`}</button>
           </div>
+          {attackState === "attacking" && (
+            <div className="loading-indicator">
+              <LoadingIndicator />
+              <p>Attacking...</p>
+            </div>
+          )}
         </div>
       )}
 

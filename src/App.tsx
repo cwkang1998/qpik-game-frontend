@@ -7,6 +7,7 @@ import { useQpikContract } from "./hooks/useQpikContract";
 import { transformCharacterData } from "./utils/transform";
 import { Character } from "./models/Character";
 import Arena from "./components/Arena";
+import LoadingIndicator from "./components/LoadingIndicator";
 
 // Constants
 const TWITTER_HANDLE = "_buildspace";
@@ -16,6 +17,11 @@ const App = () => {
   const { connect, account, signer } = useWeb3();
   const { contract, fetchNFTMetadata } = useQpikContract(signer);
   const [characterNFT, setCharacterNFT] = useState<Character>();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+  }, []);
 
   useEffect(() => {
     const onCharacterMint = async (
@@ -41,6 +47,7 @@ const App = () => {
       } else {
         console.log("No character NFT found");
       }
+      setIsLoading(false);
     };
 
     if (account) {
@@ -60,6 +67,9 @@ const App = () => {
   }, [account, contract, fetchNFTMetadata]);
 
   const renderContent = () => {
+    if (isLoading) {
+      return <LoadingIndicator />;
+    }
     if (!account) {
       return (
         <div className="connect-wallet-container">
